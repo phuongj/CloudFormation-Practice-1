@@ -1,0 +1,73 @@
+{
+"AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "",
+    "Metadata": {
+
+    },
+    "Parameters": {
+    
+    },
+    "Mappings": {
+
+    },
+    "Conditions": {
+
+    },
+    "Resources": {
+        
+        "EC2Instance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "DisableApiTermination": "false",
+                "ImageId": "ami-04fc83311a8d478df",
+                "InstanceType": "t2.micro",
+                "SecurityGroupIds": [
+                    {"Ref" : "SecurityGroup"}
+                ], 
+                "Monitoring": "false",
+                "Tags": [
+                    {"Key" : "Name", "Value" : "Practice1EC2Instance"}
+                ]
+            }
+        },
+
+        "VolumeAttachment": {
+            "Type": "AWS::EC2::VolumeAttachment",
+            "Properties": {
+                "InstanceId": {
+                    "Ref": "EC2Instance"
+                },
+                "VolumeId": {
+                    "Ref": "EC2Volume"
+                },
+                "Device": "/dev/sdh"
+            }
+        },
+
+
+        "EC2Volume": {
+            "Type": "AWS::EC2::Volume",
+            "Properties": {
+                "Size": "10",
+                "AvailabilityZone": {
+                    "Fn::GetAtt": [
+                        "EC2Instance",
+                        "AvailabilityZone"
+                    ]
+                }
+            }
+        },
+        
+        
+        "SecurityGroup" : {
+          "Type" : "AWS::EC2::SecurityGroup",
+          "Properties" : {
+            "GroupDescription" : "Security group for Practice1EC2Instance"
+            }
+        }
+        
+    },
+    "Outputs": {
+
+    }
+}
