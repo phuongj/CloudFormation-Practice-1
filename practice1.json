@@ -1,36 +1,11 @@
 {
-"AWSTemplateFormatVersion": "2010-09-09",
+    "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "",
-    "Metadata": {
-
-    },
-    "Parameters": {
-    
-    },
-    "Mappings": {
-
-    },
-    "Conditions": {
-
-    },
+    "Metadata": {},
+    "Parameters": {},
+    "Mappings": {},
+    "Conditions": {},
     "Resources": {
-        
-        "EC2Instance": {
-            "Type": "AWS::EC2::Instance",
-            "Properties": {
-                "DisableApiTermination": "false",
-                "ImageId": "ami-04fc83311a8d478df",
-                "InstanceType": "t2.micro",
-                "SecurityGroupIds": [
-                    {"Ref" : "SecurityGroup"}
-                ], 
-                "Monitoring": "false",
-                "Tags": [
-                    {"Key" : "Name", "Value" : "Practice1EC2Instance"}
-                ]
-            }
-        },
-
         "VolumeAttachment": {
             "Type": "AWS::EC2::VolumeAttachment",
             "Properties": {
@@ -43,8 +18,6 @@
                 "Device": "/dev/sdh"
             }
         },
-
-
         "EC2Volume": {
             "Type": "AWS::EC2::Volume",
             "Properties": {
@@ -57,17 +30,61 @@
                 }
             }
         },
-        
-        
-        "SecurityGroup" : {
-          "Type" : "AWS::EC2::SecurityGroup",
-          "Properties" : {
-            "GroupDescription" : "Security group for Practice1EC2Instance"
+        "SecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Security group for Practice1EC2Instance"
+            }
+        },
+        "LaunchTemplate": {
+            "Type": "AWS::EC2::LaunchTemplate",
+            "Properties": {
+                "LaunchTemplateName": "PracticeLaunchTemplate",
+                "LaunchTemplateData": {
+                    "DisableApiTermination": "false",
+                    "ImageId": "ami-04fc83311a8d478df",
+                    "InstanceType": "t2.micro",
+                    "SecurityGroups": [
+                        {
+                            "Ref": "SecurityGroup"
+                        }
+                    ],
+                    "Monitoring": "false",
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": "Practice1EC2Instance"
+                        }
+                    ]
+                }
+            }
+        },
+        "AutoScalingGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "AvailabilityZones": [
+                    {
+                        "Fn::GetAtt": [
+                            "EC2Instance",
+                            "AvailabilityZone"
+                        ]
+                    }
+                ],
+                "LaunchTemplate": {
+                    "LaunchTemplateId": {
+                        "Ref": "LaunchTemplate"
+                    },
+                    "Version": {
+                        "Fn::GetAtt": [
+                            "LaunchTemplate",
+                            "LatestVersionNumber"
+                        ]
+                    }
+                },
+                "MaxSize": "4",
+                "MinSize": "1"
             }
         }
-        
     },
-    "Outputs": {
-
-    }
+    "Outputs": {}
 }
